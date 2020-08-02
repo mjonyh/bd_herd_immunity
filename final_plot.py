@@ -70,7 +70,7 @@ df_isolation = pd.read_csv('data/isolation.csv')
 df_isolation = convert_numeric(df_isolation, 'date')
 
 ### mobility https://www.google.com/covid19/mobility/
-df_mobility = pd.read_csv('data/mobility.csv')
+df_mobility = pd.read_csv('data/test.csv')
 df_mobility = df_mobility[df_mobility['country_region_code']=='BD']
 df_mobility = df_mobility[['date','retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline']]
 df_mobility_mean = df_mobility[['retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline']]

@@ -48,18 +48,18 @@ plot_data_plot_sim = ['r0', 're']
 plot_data_label_plot_sim = ['$R_0$', 'Reproduction Number', '$R_e$']
 reproduction_legend = ['$R_0$', '$R_e$']
 
-df_rt = pd.read_csv('rt.csv')
+df_rt = pd.read_csv('data/rt.csv')
 df_rt = convert_numeric(df_rt, 'Date')
 # print(df_rt)
 
-df_doublings = pd.read_csv('doublingtimes.csv')
+df_doublings = pd.read_csv('data/doublingtimes.csv')
 df_doublings = convert_numeric(df_doublings, 'date')
 
-df_isolation = pd.read_csv('isolation.csv')
+df_isolation = pd.read_csv('data/isolation.csv')
 df_isolation = convert_numeric(df_isolation, 'date')
 
 ### mobility https://www.google.com/covid19/mobility/
-df_mobility = pd.read_csv('mobility.csv')
+df_mobility = pd.read_csv('data/mobility.csv')
 df_mobility = df_mobility[df_mobility['country_region_code']=='BD']
 df_mobility = df_mobility[['date','retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline','residential_percent_change_from_baseline']]
 df_mobility_mean = df_mobility[['retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline','residential_percent_change_from_baseline']]
@@ -85,11 +85,11 @@ hospital_beds = 7034
 for i in range(len(files)):
 
     ### Real data
-    df_1 = pd.read_csv(files[i]+'_1.csv', encoding='UTF-8')
+    df_1 = pd.read_csv('data/'+files[i]+'_1.csv', encoding='UTF-8')
     df_1 = convert_numeric(df_1, 'days')
 
     ### Simulated data
-    df_2 = pd.read_csv(files[i]+'_2.csv', encoding='UTF-8')
+    df_2 = pd.read_csv('data/'+files[i]+'_2.csv', encoding='UTF-8')
     df_2 = convert_numeric(df_2, 'days_sim')
 
     # ### cases

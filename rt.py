@@ -23,7 +23,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 # %matplotlib inline
 
 # dataset = pd.read_csv('datasetcv.csv')
-dataset = pd.read_csv('Bangladesh_80_1.csv')
+dataset = pd.read_csv('data/Bangladesh_80_1.csv')
 dataset['Date'] = pd.to_datetime(dataset['days']).dt.strftime('%Y-%m-%d')
 dataset['confirmed'] = pd.to_numeric(dataset['confirmed'])
 # print(dataset.head())
@@ -238,7 +238,7 @@ def plot_rt(result, ax, district_name):
   
     ax.set_title(str(district_name))
   
-    result.to_csv('rt.csv')
+    result.to_csv('data/rt.csv')
     # Colors
     ABOVE = [1,0,0]
     MIDDLE = [1,1,1]
@@ -353,7 +353,7 @@ data = {
         }
 
 df = pd.DataFrame(data)
-df.to_csv('doublingtimes.csv')
+df.to_csv('data/doublingtimes.csv')
 
 plt.figure(figsize=(6, 4))
 plt.autoscale(enable=True, axis='x', tight=True)

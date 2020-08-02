@@ -15,6 +15,7 @@ import warnings
 import pandas as pd
 import numpy as np
 import altair as alt
+import sys
 
 from matplotlib.ticker import MaxNLocator
 warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -23,11 +24,15 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 # %matplotlib inline
 
 # dataset = pd.read_csv('datasetcv.csv')
-dataset = pd.read_csv('data/Bangladesh_80_1.csv')
-dataset['Date'] = pd.to_datetime(dataset['days']).dt.strftime('%Y-%m-%d')
-dataset['confirmed'] = pd.to_numeric(dataset['confirmed'])
-# print(dataset.head())
-dataSeries = pd.Series(dataset['confirmed'].values, index=dataset['Date'])
+dataset = pd.read_csv('data/Bangladesh_90_'+sys.argv[1]+'.csv')
+if(sys.argv[1]=='1'):
+    dataset['Date'] = pd.to_datetime(dataset['days']).dt.strftime('%Y-%m-%d')
+    dataset['confirmed'] = pd.to_numeric(dataset['confirmed'])
+    dataSeries = pd.Series(dataset['confirmed'].values, index=dataset['Date'])
+else:
+    dataset['Date'] = pd.to_datetime(dataset['days_sim']).dt.strftime('%Y-%m-%d')
+    dataset['confirmed_sim'] = pd.to_numeric(dataset['confirmed_sim'])
+    dataSeries = pd.Series(dataset['confirmed_sim'].values, index=dataset['Date'])
 # print(dataSeries)
 
 # datasetxl = pd.read_excel('dataset.xlsx','Sheet1')
@@ -238,7 +243,7 @@ def plot_rt(result, ax, district_name):
   
     ax.set_title(str(district_name))
   
-    result.to_csv('data/rt.csv')
+    result.to_csv('data/rt_'+sys.argv[1]+'.csv')
     # Colors
     ABOVE = [1,0,0]
     MIDDLE = [1,1,1]
@@ -353,7 +358,7 @@ data = {
         }
 
 df = pd.DataFrame(data)
-df.to_csv('data/doublingtimes.csv')
+df.to_csv('data/doublingtimes_'+sys.argv[1]+'.csv')
 
 plt.figure(figsize=(6, 4))
 plt.autoscale(enable=True, axis='x', tight=True)
@@ -367,5 +372,5 @@ _ = plt.xticks(np.arange(0, len(dates), step=3))
 
 
 
-plt.show()
+# plt.show()
 

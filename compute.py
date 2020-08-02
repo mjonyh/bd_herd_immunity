@@ -58,7 +58,7 @@ data_1 = {
         }
 
 df = pd.DataFrame(data_1)
-df.to_csv(country+'_'+save_percent+'_1.csv', index=False)
+df.to_csv('data/'+country+'_'+save_percent+'_1.csv', index=False)
 
 data_2 = {
         'days_sim': days_array,
@@ -77,7 +77,7 @@ data_2 = {
         }
 
 df = pd.DataFrame(data_2)
-df.to_csv(country+'_'+save_percent+'_2.csv', index=False)
+df.to_csv('data/'+country+'_'+save_percent+'_2.csv', index=False)
 
 plt.show()
 

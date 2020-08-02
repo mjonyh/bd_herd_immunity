@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
 
-df_age = pd.read_csv('Bangladesh_age_distribution.csv')
+df_age = pd.read_csv('data/Bangladesh_age_distribution.csv')
 
 
 df_age['Percentage'] = df_age['Population']*100/df_age['Population'].sum()

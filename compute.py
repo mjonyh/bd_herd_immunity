@@ -1,4 +1,5 @@
 from sird_model import *
+import sys
 
 # Create an instance of the SIRD model, asking for the data to be used.
 # plt.style.use('grayscale')
@@ -24,8 +25,13 @@ age_death_distribution = np.array([ 1.01, 1.85, 3.52, 8.05, 17.11, 31.38, 37.08 
 # people = [17.7e6, 53.0e6]
 # for country in countries:
 # for i in range(len(save_percent)):
-save_percent = '90'
-people = 53.0e6
+# save_percent = '30'
+save_percent = sys.argv[1]
+
+if(save_percent=='30'):
+    people = 17.7e6
+else:
+    people = 53.0e6
 
 m = Model(country=country, people=people, tag=0)
 

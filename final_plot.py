@@ -5,6 +5,10 @@ register_matplotlib_converters()
 import seaborn as sns
 sns.set()
 
+import chart_studio
+import chart_studio.plotly as py
+import chart_studio.tools as tls
+
 def convert_numeric(df, date_column):
     cols=[i for i in df.columns if i not in [date_column]]
     for col in cols:
@@ -13,20 +17,21 @@ def convert_numeric(df, date_column):
     return df
 
 
-def graph_plot(x, y, tag):
-    plt.figure(tag[0])
+def graph_plot(x, y, tag, ax):
+    # plt.figure(tag[0])
 
     if(tag[1]=='plot'):
-        ax = plt.plot(x, y, tag[2], label=tag[3])
+        ax.plot(x, y, tag[2], label=tag[3])
     elif(tag[1]=='semilogy'):
-        ax = plt.semilogy(x, y, tag[2], label=tag[3])
+        ax.semilogy(x, y, tag[2], label=tag[3])
 
 
     if(tag[3]!=None):
-        plt.legend()
+        ax.legend()
 
     plt.xticks(rotation=45)
     plt.ylabel(tag[4])
+
 
 '''
 files required
@@ -48,12 +53,18 @@ plot_data_plot_sim = ['r0', 're']
 plot_data_label_plot_sim = ['$R_0$', 'Reproduction Number', '$R_e$']
 reproduction_legend = ['$R_0$', '$R_e$']
 
-df_rt = pd.read_csv('data/rt.csv')
-df_rt = convert_numeric(df_rt, 'Date')
+df_rt_1 = pd.read_csv('data/rt_1.csv')
+df_rt_1 = convert_numeric(df_rt_1, 'Date')
+
+df_rt_2 = pd.read_csv('data/rt_2.csv')
+df_rt_2 = convert_numeric(df_rt_2, 'Date')
 # print(df_rt)
 
-df_doublings = pd.read_csv('data/doublingtimes.csv')
-df_doublings = convert_numeric(df_doublings, 'date')
+df_doublings_1 = pd.read_csv('data/doublingtimes_1.csv')
+df_doublings_1 = convert_numeric(df_doublings_1, 'date')
+
+df_doublings_2 = pd.read_csv('data/doublingtimes_2.csv')
+df_doublings_2 = convert_numeric(df_doublings_2, 'date')
 
 df_isolation = pd.read_csv('data/isolation.csv')
 df_isolation = convert_numeric(df_isolation, 'date')
@@ -75,12 +86,11 @@ data = {'Cases': [ 10.2, 54.6, 28.4, 6.7 ],
 
 df = pd.DataFrame(data)
 
-# fig, ax1 = plt.subplots()
-
 ### Hospitals beds: https://public.tableau.com/profile/masud.parvez7954#!/vizhome/Logistics_15857300704580/facility-1
 hospital_beds = 7034
-# home_isolation = pd.to_numeric([6021, 6240, 6498, 6754, 6946, 7162, 7399, 7552, 7893, 8243, 8764, 9012, 9340, 9758, 10026, 10302, 10752, 11026, 11474, 11915, 12190, 12467, 12927, 13158, 13429, 13800])
-# home_isolation_date = pd.to_datetime(['2020-06-01', '2020-06-02', '2020-06-03', '2020-06-04', '2020-06-05', '2020-06-06', '2020-06-06', '2020-06-08', '2020-06-09', '2020-06-10', '2020-06-11', '2020-06-12', '2020-06-13', '2020-06-14', '2020-06-15', '2020-06-16', '2020-06-17', '2020-06-18', '2020-06-19', '2020-06-20', '2020-06-21', '2020-06-22', '2020-06-23', '2020-06-24', '2020-06-25', '2020-06-26'])
+
+fig1, ax1 = plt.subplots(1)
+fig2, ax2 = plt.subplots(1)
 
 for i in range(len(files)):
 
@@ -92,64 +102,58 @@ for i in range(len(files)):
     df_2 = pd.read_csv('data/'+files[i]+'_2.csv', encoding='UTF-8')
     df_2 = convert_numeric(df_2, 'days_sim')
 
-    # ### cases
-    # if (i<1):
-    #     tag = [11, 'semilogy', 'kx', None, None]
-    #     graph_plot(df_1['days'], df_1['active'], tag)       # active cases
-    #     tag = [11, 'semilogy', 'mx', None, None]
-    #     graph_plot(df_1['days'], df_1['confirmed'].diff(), tag)       # growth cases
-    #     tag = [11, 'semilogy', 'rx', None, None]
-    #     graph_plot(df_1['days'], df_1['deaths'], tag)       # death cases
-    #     plt.axhline(hospital_beds, color='black', linestyle='dotted')
-    #     plt.text('2020-03-01', hospital_beds*1.2, 'Covid Beds', size=10)
-    #     # tag = [11, 'semilogy', 'gx', None, None]
-    #     # graph_plot(home_isolation_date, home_isolation, tag)
-    #     # graph_plot(df_isolation['date'], df_isolation['isolation'], tag)
-    #     # plt.axvline('2020-05-25', color='maroon', alpha=0.5, linestyle='--')
-    #     # plt.text('2020-05-26', 1e5, 'Regional\nLockdown', color='maroon', size=10)
-    #     # plt.axvline('2020-05-05', color='green', alpha=0.5, linestyle='--')
-    #     # plt.text('2020-05-06', 1e5, 'Lockdown\nRelaxed', color='green', size=10)
-    #     # plt.axvline('2020-04-09', color='black', alpha=0.5, linestyle='--')
-    #     # plt.text('2020-04-10', 1e5, 'Lockdown\nStarted', size=10)
+    ### cases
+    if (i<1):
+        tag = [11, 'semilogy', 'kx', None, None]
+        graph_plot(df_1['days'], df_1['active'], tag, ax1)       # active cases
+        tag = [11, 'semilogy', 'mx', None, None]
+        graph_plot(df_1['days'], df_1['confirmed'].diff(), tag, ax1)       # growth cases
+        tag = [11, 'semilogy', 'rx', None, None]
+        graph_plot(df_1['days'], df_1['deaths'], tag, ax1)       # death cases
+        ax1.axhline(hospital_beds, color='black', linestyle='dotted')
+        ax1.text('2020-03-01', hospital_beds*1.2, 'Covid Beds', size=10)
+        # tag = [11, 'semilogy', 'gx', None, None]
+        # graph_plot(home_isolation_date, home_isolation, tag)
+        # graph_plot(df_isolation['date'], df_isolation['isolation'], tag)
+        # plt.axvline('2020-05-25', color='maroon', alpha=0.5, linestyle='--')
+        # plt.text('2020-05-26', 1e5, 'Regional\nLockdown', color='maroon', size=10)
+        # plt.axvline('2020-05-05', color='green', alpha=0.5, linestyle='--')
+        # plt.text('2020-05-06', 1e5, 'Lockdown\nRelaxed', color='green', size=10)
+        # plt.axvline('2020-04-09', color='black', alpha=0.5, linestyle='--')
+        # plt.text('2020-04-10', 1e5, 'Lockdown\nStarted', size=10)
 
 
-    # ### active cases
-    # tag = [11, 'semilogy', marker[i], 'A ('+population[i]+')', None]
-    # graph_plot(df_2['days_sim'], df_2['active_sim'], tag)
+    ### active cases
+    tag = [11, 'semilogy', marker[i], 'A ('+population[i]+')', None]
+    graph_plot(df_2['days_sim'], df_2['active_sim'], tag, ax1)
 
-    # ### hospital required
-    # tag = [11, 'semilogy', marker[i+2], 'HR ('+population[i]+')', None]
-    # graph_plot(df_2['days_sim'], df_2['active_sim']*16/100, tag)
+    ### hospital required
+    tag = [11, 'semilogy', marker[i+2], 'HR ('+population[i]+')', None]
+    graph_plot(df_2['days_sim'], df_2['active_sim']*16/100, tag, ax1)
 
-    # ### Death Cases
-    # tag = [11, 'semilogy', marker[i+4], 'D ('+population[i]+')', 'Number of Cases']
-    # graph_plot(df_2['days_sim'], df_2['deaths_sim'], tag)
+    ### Death Cases
+    tag = [11, 'semilogy', marker[i+4], 'D ('+population[i]+')', 'Number of Cases']
+    graph_plot(df_2['days_sim'], df_2['deaths_sim'], tag, ax1)
 
-    # # ### susceptible Cases
-    # # tag = [11, 'semilogy', marker[i+6], 'S ('+population[i]+')', 'Number of Cases']
-    # # graph_plot(df_2['days_sim'], df_2['susceptible_sim'], tag)
+    # ### susceptible Cases
+    # tag = [11, 'semilogy', marker[i+6], 'S ('+population[i]+')', 'Number of Cases']
+    # graph_plot(df_2['days_sim'], df_2['susceptible_sim'], tag)
 
-    # ### growth cases
-    # tag = [11, 'semilogy', marker[i+8], 'G ('+population[i]+')', 'Number of Cases']
-    # graph_plot(df_2['days_sim'], df_2['confirmed_sim'].diff(), tag)
-    # g_max = df_2['confirmed_sim'].diff().max()
-    # plt.axhline(g_max, color='m', linestyle=':')
-    # plt.text('2020-03-01', g_max*1.2, '$G_{max}$: '+str(int(g_max/1e3))+'K', size=10)
+    ### growth cases
+    tag = [11, 'semilogy', marker[i+8], 'G ('+population[i]+')', 'Number of Cases']
+    graph_plot(df_2['days_sim'], df_2['confirmed_sim'].diff(), tag, ax1)
+    g_max = df_2['confirmed_sim'].diff().max()
+    ax1.axhline(g_max, color='m', linestyle=':')
+    ax1.text('2020-03-01', g_max*1.2, '$G_{max}$: '+str(int(g_max/1e3))+'K', size=10)
 
-    # # print(int(df_2['confirmed_sim'][df_2['days_sim']=='2020-09-01'].values[0]))
+    # print(int(df_2['confirmed_sim'][df_2['days_sim']=='2020-09-01'].values[0]))
 
-    # plt.ylim(bottom=1, top=1e6)
-    # plt.xlim(xmin='2020-03-01', xmax='2021-04-01')
-    # # plt.xlim(xmin='2020-03-01')
-    # plt.legend(ncol=2, fancybox=True, framealpha=0.2)
+    ax1.set_ylim(bottom=1, top=1e6)
+    ax1.set_xlim(xmin='2020-03-01', xmax='2021-04-01')
+    # plt.xlim(xmin='2020-03-01')
+    ax1.legend(ncol=2, fancybox=True, framealpha=0.2)
 
-    ### Reproduction number
-    final_r0 = df_2['r0'][50:len(df_2['r0'])-1].mean()
-    print('R0 = ', df_2['r0'][50:len(df_2['r0'])-1].mean())
-    print('beta = ', df_2['beta'][50:len(df_2['r0'])-1].mean())
-    print('gamma = ', df_2['gamma'][50:len(df_2['r0'])-1].mean())
-    print('mu = ', df_2['mu'][50:len(df_2['r0'])-1].mean())
-
+    ### reproduction numbers
     if (i<1):
 
         ### R0
@@ -167,130 +171,174 @@ for i in range(len(files)):
 
         ### mobility
         tag = [12, 'plot', 'k-', 'Negative Mobility (x10)', None]
-        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag)
+        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2)
         tag = [12, 'plot', 'k.', None, None]
-        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag)
+        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2)
 
         ### growth
         tag = [12, 'plot', 'b-', 'Daily Growth (x1K)', None]
-        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag)
+        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
         tag = [12, 'plot', 'b.', None, None]
-        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag)
+        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
 
         ### doublingtimes
         tag = [12, 'plot', 'g-', 'Doubling Time (x10)', None]
-        graph_plot(df_doublings['date'], df_doublings['doublingtimes']/10, tag)
+        graph_plot(df_doublings_1['date'], df_doublings_1['doublingtimes']/10, tag, ax2)
         tag = [12, 'plot', 'g.', None, None]
-        graph_plot(df_doublings['date'], df_doublings['doublingtimes']/10, tag)
+        graph_plot(df_doublings_1['date'], df_doublings_1['doublingtimes']/10, tag, ax2)
 
         ### lock down
         text_position = 4.5
         line_max = 6
-        plt.vlines(x='2020-03-26', ymin=0, ymax=line_max, color='black', alpha=0.5)
-        plt.text('2020-03-27', text_position, '$L_1$\nC: 44\nD: 5', size=10)
-        plt.vlines('2020-04-26', ymin=0, ymax=line_max, color='k', alpha=0.5)
-        plt.text('2020-04-27', text_position, '$L_2$\nC: 5416\nD: 145', color='black', size=10)
-        plt.vlines('2020-05-10', color='k', alpha=0.5, ymin=0, ymax=line_max)
-        plt.text('2020-05-11', text_position, '$L_3$\nC: 14657\nD: 228', color='black', size=10)
-        plt.vlines('2020-05-30', color='k', alpha=0.5, ymin=0, ymax=line_max)
-        plt.text('2020-05-31', text_position, '$L_4$\nC: 44608\nD: 610', color='black', size=10)
+        ax2.vlines(x='2020-03-26', ymin=0, ymax=line_max, color='black', alpha=0.5)
+        ax2.text('2020-03-27', text_position, '$L_1$\nC: 44\nD: 5', size=10)
+        ax2.vlines('2020-04-26', ymin=0, ymax=line_max, color='k', alpha=0.5)
+        ax2.text('2020-04-27', text_position, '$L_2$\nC: 5416\nD: 145', color='black', size=10)
+        ax2.vlines('2020-05-10', color='k', alpha=0.5, ymin=0, ymax=line_max)
+        ax2.text('2020-05-11', text_position, '$L_3$\nC: 14657\nD: 228', color='black', size=10)
+        ax2.vlines('2020-05-30', color='k', alpha=0.5, ymin=0, ymax=line_max)
+        ax2.text('2020-05-31', text_position, '$L_4$\nC: 44608\nD: 610', color='black', size=10)
 
         ### Rt
         tag = [12, 'plot', 'r-', '$R_t$', None]
-        graph_plot(df_rt['Date'], df_rt['ML'], tag)       # active cases
+        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
         tag = [12, 'plot', 'r.', None, None]
-        graph_plot(df_rt['Date'], df_rt['ML'], tag)       # active cases
-        plt.fill_between(df_rt['Date'], df_rt['Low_90'], df_rt['High_90'], alpha=0.5, color='r')
+        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
+        test = ax2.fill_between(df_rt_1['Date'], df_rt_1['Low_90'], df_rt_1['High_90'], alpha=0.5, color='r')
 
-        plt.ylabel('Magnitude')
-    plt.xlim(xmin='2020-03-15', xmax='2020-08-01')
-    plt.legend(ncol=2, framealpha=0.2, loc='upper right')
-    #     # plt.text('2020-06-10', 2.0, 'Growth (x1K)', rotation=0, color='g')
+        ax2.set_ylabel('Magnitude')
+    ax2.set_xlim(xmin='2020-03-15', xmax='2020-08-01')
+    ax2.legend(ncol=2, framealpha=0.2, loc='upper right')
+    ax2.set_ylim(bottom=0, top=7.5)
 
-    # # tag = [12, 'plot', marker[i+4], '$R_e$ ('+population[i]+')', 'Reproduction Number']
-    # # graph_plot(df_2['days_sim'], final_r0*df_2['susceptible_sim']/df_2['susceptible_sim'][0], tag) 
-    # # plt.fill_between(df_2['days_sim'], final_r0*df_2['susceptible_sim']/df_2['susceptible_sim'][0]+0.25, final_r0*df_2['susceptible_sim']/df_2['susceptible_sim'][0]-0.25, color='r', alpha=0.2)
+# plt.show()
 
-    plt.ylim(bottom=0, top=7.5)
-    # # plt.xlim('2020-03-15', '2020-07-01')
-    # # plt.legend(ncol=3, loc='upper right', fancybox=True, framealpha=0.2)
-    # plt.legend(ncol=2, framealpha=0.2, loc='upper right')
+import chart_studio
+import chart_studio.plotly as py
+import chart_studio.tools as tls
+import plotly.express as px
+import plotly.graph_objects as go
 
-    # # test_df = df_2[df_2['days_sim']>'2020-05-14']
-    # # print(test_df)
-    # # print(test_df['r0'].mean(), test_df['r0'].std(ddof=0))
+username='mjonyh-phy'
+api_key='BeJs4fGTnPuNtmWNWZ5C'
+chart_studio.tools.set_credentials_file(username=username, api_key=api_key)
 
-    # # plt.figure(13)
-    # # plt.plot(df_1['days'], df_1['confirmed'], '-')
-    # # plt.plot(df_1['days'], df_1['confirmed'], 'o')
+figure_1 = go.Figure(data=[
+        go.Scatter(
+            x=df_2['days_sim'],
+            y=df_2['confirmed_sim'],
+            name='Estimated Confirm Cases'
+            ),
+        go.Scatter(
+            x=df_1['days'],
+            y=df_1['confirmed'],
+            mode='markers',
+            name='Real Confirmed Cases'
+            ),
 
-    # plt.xlim(xmin='2020-03-15', xmax='2020-08-01')
-    # plt.ylim(0,7.5)
+        go.Scatter(
+            x=df_2['days_sim'],
+            y=df_2['recovered_sim'],
+            name='Estimated Recovered Cases'
+            ),
+        go.Scatter(
+            x=df_1['days'],
+            y=df_1['recovered'],
+            mode='markers',
+            name='Real Recovered Cases'
+            ),
 
-    # ### CFR
-    # if (i>0):
-    #     tag = [13, 'plot', 'kx', None, None]
-    #     graph_plot(df_1['days'], df_1['cfr_recovered'], tag)       # active cases
-    #     tag = [13, 'plot', 'gx', None, None]
-    #     graph_plot(df_1['days'], df_1['cfr_confirmed'], tag)       # active cases
-    #     tag = [13, 'plot', marker[0], 'CFR$_{adj}$', None]
-    #     graph_plot(df_2['days_sim'], df_2['cfr_recovered_sim'], tag)       # active cases
-    #     tag = [13, 'plot', marker[i+1], 'CFR', 'Case Fatality Rate (in %)']
-    #     graph_plot(df_2['days_sim'], df_2['cfr_confirmed_sim'], tag)       # active cases
+        go.Scatter(
+            x=df_2['days_sim'],
+            y=df_2['deaths_sim'],
+            name='Estimated Deaths Cases'
+            ),
+        go.Scatter(
+            x=df_1['days'],
+            y=df_1['deaths'],
+            mode='markers',
+            name='Real Deaths Cases'
+            ),
 
-    #     for k in range(len(df['label'])):
-    #         tag = [13, 'plot', marker[i+2+k], 'Age: '+df['label'][k], 'Case Fatality Rate (in %)']
-    #         graph_plot(df_2['days_sim'], df_2['cfr_confirmed_sim']*df['Deaths'][k]/df['Cases'][k], tag)       # active cases
+        go.Scatter(
+            x=df_2['days_sim'],
+            y=df_2['active_sim'],
+            name='Estimated Active Cases'
+            ),
+        go.Scatter(
+            x=df_1['days'],
+            y=df_1['active'],
+            mode='markers',
+            name='Real Active Cases'
+            )
+        ])
 
-    #     plt.xlim(xmin='2020-05-01', xmax='2021-10-01')
-    # plt.ylim(0,15)
-    # plt.legend(ncol=3, loc='upper center', fancybox=True, framealpha=0.2)
+figure_1.update_layout(
+        yaxis_type='log',
+        )
 
-    # # ### Reproduction number
-    # # final_r0 = df_2['r0'][len(df_2['r0'])-1]
-    # # # tag = [14, 'plot', marker[i+4], '$R_e$ ('+population[i]+')', 'Reproduction Number']
-    # # # graph_plot(df_2['days_sim'], final_r0*df_2['susceptible_sim']/df_2['susceptible_sim'][0], tag)       # active cases
-    # # # plt.fill_between(df_2['days_sim'], final_r0*df_2['susceptible_sim']/df_2['susceptible_sim'][0]+0.5, final_r0*df_2['susceptible_sim']/df_2['susceptible_sim'][0]-0.5, color='r', alpha=0.2)
-    
-    # # if (i<1):
-    # #     # tag = [12, 'plot', 'k-', '$R_0$', None]
-    # #     # graph_plot(df_2['days_sim'], df_2['r0'], tag)       # active cases
-    # #     tag = [14, 'plot', 'k-', '$R_t$', None]
-    # #     graph_plot(df_rt['Date'], df_rt['ML'], tag)       # active cases
-    # #     tag = [14, 'plot', 'r.', None, None]
-    # #     graph_plot(df_rt['Date'], df_rt['ML'], tag)       # active cases
-    # #     plt.fill_between(df_rt['Date'], df_rt['Low_90'], df_rt['High_90'], color='black', alpha=0.2)
-    # #     # plt.axhline(final_r0, color='black', linestyle='-', label='$R_0$')
-    # #     # plt.fill_between(df_2['days_sim'], final_r0+0.5, final_r0-0.5, color='k', alpha=0.2)
-    # #     tag = [14, 'plot', 'g.', None, None]
-    # #     graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag)
-    # #     tag = [14, 'plot', 'g-', 'Confirmed (x1K)', None]
-    # #     graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag)
-    # #     plt.xlim(xmin='2020-04-01')
-    # #     plt.ylim(0, 5)
+figure_1.update_xaxes(range=['2020-04-01', '2021-01-01'])
 
-    # last_data_index = len(df_1['days'])
-    # test_df = df_2[df_2['active_sim'] == df_2['active_sim'].max()]
-    # print()
-    # print('Peak Confirmed: ', test_df['confirmed_sim'], 'Last Confirmed: ', df_1['confirmed'][last_data_index-1], 'last deaths: ', df_1['deaths'][last_data_index-1], 'last active: ', df_1['active'][last_data_index-1], 'R0: ', final_r0)
-    # print(df_1['days'][last_data_index-1], 'Peak Susceptible: ', test_df['susceptible_sim'], 'Peak active: ', test_df['active_sim'])
-    # print(test_df)
+# trace1 = go.Scatter(
+#         x=df_rt['Date'],
+#         y=df_rt['ML'],
+#         name='Rt'
+#         )
 
-    # ### for observation ###
-    # # # for i in range(last_data_index-10, last_data_index - 1):
-    # # #     print('Real: ', df_1['confirmed'][i], 'Simulated: ', df_2['confirmed_sim'][i])
-    # # print('Date \t \t Confirmed \t \t Recovered \t \t Deaths')
-    # # j = 0
-    # # for i in range(last_data_index, last_data_index+14):
-    # #     print_confirmed = int(df_2['confirmed_sim'][i])
-    # #     print_recovered = int(df_2['recovered_sim'][i])
-    # #     print_deaths = int(df_2['deaths_sim'][i])
+# trace2 = go.Scatter(
+#         x=df_doublings['date'],
+#         y=df_doublings['doublingtimes']/10,
+#         name='Doubling Times'
+#         )
 
-    # #     print(df_2['days_sim'][i].strftime("%Y-%m-%d"), '\t', print_confirmed, '+/-', int(print_confirmed*(0.5+(j*0.01))/100), '\t', print_recovered, '+/-', int(print_recovered*(0.5+(j*0.01))/100), '\t', print_deaths, '+/-', int(print_deaths*(0.5+(j*0.01))/100))
-    # #     j = j+1
+# data = [trace1, trace2]
 
+# figure_2 = go.Figure(data=data)
 
-    # # test_df = df_2[df_2['active_sim'] == df_2['active_sim'].max()]
-    # # print('Peak Confirmed: ', test_df['confirmed_sim'], 'Last Confirmed: ', df_1['confirmed'][last_data_index-1])
+figure_2 = go.Figure(data=[
+    go.Scatter(
+        x=df_rt_1['Date'],
+        y=df_rt_1['ML'],
+        name='Rt'
+        ),
+    go.Scatter(
+        x=df_doublings_1['date'],
+        y=df_doublings_1['doublingtimes']/10,
+        name='Doubling Times (x10)'
+        ),
 
-plt.show()
+    go.Scatter(
+        x=df_rt_1['Date'],
+        y=df_rt_1['High_90'],
+        fill=None,
+        name='High 90'
+        ),
+
+    go.Scatter(
+        x=df_rt_1['Date'],
+        y=df_rt_1['Low_90'],
+        fill='tonexty',
+        name='Low 90'
+        )
+    ])
+# figure_2.add_trace(
+#         go.Scatter(x=df_rt['Date'], y=df_rt['High_90'], fill=None,
+#                     # mode='none',  # override default markers+lines
+#                     name='High 90'
+#                     ))
+# figure_2.add_trace(
+#     go.Scatter(x=df_rt['Date'], y=df_rt['Low_90'], fill='tonexty',
+#                     # mode= 'none'
+#                     name='Low 90'
+#                     ))
+
+# figure_2.add_trace(
+#     go.Scatter(
+#         x=df_doublings['date'],
+#         y=df_doublings['doublingtimes']/10,
+#         name=r'Doubling Times'
+#         )
+#         )
+
+py.plot(figure_1, filename='figure 1')
+py.plot(figure_2, filename='figure 2')

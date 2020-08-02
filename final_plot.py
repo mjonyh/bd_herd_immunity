@@ -72,8 +72,8 @@ df_isolation = convert_numeric(df_isolation, 'date')
 ### mobility https://www.google.com/covid19/mobility/
 df_mobility = pd.read_csv('data/mobility.csv')
 df_mobility = df_mobility[df_mobility['country_region_code']=='BD']
-df_mobility = df_mobility[['date','retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline','residential_percent_change_from_baseline']]
-df_mobility_mean = df_mobility[['retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline','residential_percent_change_from_baseline']]
+df_mobility = df_mobility[['date','retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline']]
+df_mobility_mean = df_mobility[['retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline']]
 df_mobility['mean'] = df_mobility_mean.mean(axis=1)
 # print(df_mobility.head())
 df_mobility = convert_numeric(df_mobility, 'date')
@@ -233,6 +233,7 @@ figure_1 = go.Figure(data=[
             x=df_1['days'],
             y=df_1['confirmed'],
             mode='markers',
+            # marker=dict(color="Black"),
             name='Real Confirmed Cases'
             ),
 
@@ -279,66 +280,71 @@ figure_1.update_layout(
 
 figure_1.update_xaxes(range=['2020-04-01', '2021-01-01'])
 
-# trace1 = go.Scatter(
-#         x=df_rt['Date'],
-#         y=df_rt['ML'],
-#         name='Rt'
-#         )
-
-# trace2 = go.Scatter(
-#         x=df_doublings['date'],
-#         y=df_doublings['doublingtimes']/10,
-#         name='Doubling Times'
-#         )
-
-# data = [trace1, trace2]
-
-# figure_2 = go.Figure(data=data)
-
 figure_2 = go.Figure(data=[
+    go.Scatter(
+        x=df_rt_2['Date'],
+        y=df_rt_2['ML'],
+        name='Predicted Rt'
+        ),
+    go.Scatter(
+        x=df_doublings_2['date'],
+        y=df_doublings_2['doublingtimes']/10,
+        name='Predicted Doubling Times (x10)'
+        ),
+
+    go.Scatter(
+        x=df_rt_2['Date'],
+        y=df_rt_2['High_90'],
+        fill=None,
+        name='Predicted High 90'
+        ),
+
+    go.Scatter(
+        x=df_rt_2['Date'],
+        y=df_rt_2['Low_90'],
+        fill='tonexty',
+        name='Predicted Low 90'
+        ),
     go.Scatter(
         x=df_rt_1['Date'],
         y=df_rt_1['ML'],
-        name='Rt'
+        name='Real Rt'
         ),
     go.Scatter(
         x=df_doublings_1['date'],
         y=df_doublings_1['doublingtimes']/10,
-        name='Doubling Times (x10)'
+        name='Real Doubling Times (x10)'
         ),
 
     go.Scatter(
         x=df_rt_1['Date'],
         y=df_rt_1['High_90'],
         fill=None,
-        name='High 90'
+        name='Real High 90'
         ),
 
     go.Scatter(
         x=df_rt_1['Date'],
         y=df_rt_1['Low_90'],
         fill='tonexty',
-        name='Low 90'
+        name='Real Low 90'
+        ),
+    go.Scatter(
+        x=df_mobility['date'],
+        y=-df_mobility['mean']/10,
+        name='Google Mobility Report'
         )
     ])
-# figure_2.add_trace(
-#         go.Scatter(x=df_rt['Date'], y=df_rt['High_90'], fill=None,
-#                     # mode='none',  # override default markers+lines
-#                     name='High 90'
-#                     ))
-# figure_2.add_trace(
-#     go.Scatter(x=df_rt['Date'], y=df_rt['Low_90'], fill='tonexty',
-#                     # mode= 'none'
-#                     name='Low 90'
-#                     ))
 
-# figure_2.add_trace(
-#     go.Scatter(
-#         x=df_doublings['date'],
-#         y=df_doublings['doublingtimes']/10,
-#         name=r'Doubling Times'
-#         )
-#         )
+figure_2.update_xaxes(range=['2020-04-01', '2021-01-01'])
+figure_2.update_yaxes(range=[-0.1, 8.0])
+figure_2.update_layout(shapes=[
+    dict(
+      type= 'line',
+      xref= 'x', x0= '2020-04-01', x1= '2021-01-01',
+      yref= 'y', y0= 1, y1= 1,
+    )
+])
 
 py.plot(figure_1, filename='figure 1')
 py.plot(figure_2, filename='figure 2')

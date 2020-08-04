@@ -332,7 +332,7 @@ figure_2 = go.Figure(data=[
     go.Scatter(
         x=df_mobility['date'],
         y=-df_mobility['mean']/10,
-        name='Google Mobility Report'
+        name='Drop in Mobility (x10)'
         )
     ])
 

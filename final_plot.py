@@ -218,10 +218,13 @@ for i in range(len(files)):
         save_df = df_2[['days_sim', 'confirmed_sim', 'recovered_sim', 'deaths_sim']].iloc[last_data_index:last_data_index+14]
         save_df.columns = ['Date', 'Confirmed Cases', 'Recovered Cases', 'Deaths']
         save_df[['Confirmed Cases', 'Recovered Cases', 'Deaths']] = save_df[['Confirmed Cases', 'Recovered Cases', 'Deaths']].astype(int)
-        save_df['Rt'] = df_rt_2['ML'].iloc[last_data_index:last_data_index+14]
+
+        rt_array = df_rt_2[df_rt_2['Date']>=last_data_date]['ML'].iloc[0:14].to_numpy()
+
+        save_df['Rt'] = rt_array
         save_df['DT'] = df_doublings_2['doublingtimes'].iloc[last_data_index:last_data_index+14].round()
 
-        save_df.to_csv('data/forcasting.csv')
+        save_df.to_csv('data/forcasting.csv', index=False)
 
 # plt.show()
 

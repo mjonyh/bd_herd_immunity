@@ -220,9 +220,10 @@ for i in range(len(files)):
         save_df[['Confirmed Cases', 'Recovered Cases', 'Deaths']] = save_df[['Confirmed Cases', 'Recovered Cases', 'Deaths']].astype(int)
 
         rt_array = df_rt_2[df_rt_2['Date']>=last_data_date]['ML'].iloc[0:14].to_numpy()
+        doubling_array = df_doublings_2[df_doublings_2['date']>=last_data_date]['doublingtimes'].iloc[0:14].round().to_numpy()
 
         save_df['Rt'] = rt_array
-        save_df['DT'] = df_doublings_2['doublingtimes'].iloc[last_data_index:last_data_index+14].round()
+        save_df['DT'] = doubling_array
 
         save_df.to_csv('data/forcasting.csv', index=False)
 

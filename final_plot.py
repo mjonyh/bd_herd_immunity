@@ -211,6 +211,18 @@ for i in range(len(files)):
     ax2.legend(ncol=2, framealpha=0.2, loc='upper right')
     ax2.set_ylim(bottom=0, top=7.5)
 
+    if(i==0):
+        last_data_date = (df_1['days'].iloc[len(df_1)-1])
+        last_data_index = len(df_1)-1
+
+        save_df = df_2[['days_sim', 'confirmed_sim', 'recovered_sim', 'deaths_sim']].iloc[last_data_index:last_data_index+14]
+        save_df.columns = ['Date', 'Confirmed Cases', 'Recovered Cases', 'Deaths']
+        save_df[['Confirmed Cases', 'Recovered Cases', 'Deaths']] = save_df[['Confirmed Cases', 'Recovered Cases', 'Deaths']].astype(int)
+        save_df['Rt'] = df_rt_2['ML'].iloc[last_data_index:last_data_index+14]
+        save_df['DT'] = df_doublings_2['doublingtimes'].iloc[last_data_index:last_data_index+14].round()
+
+        save_df.to_csv('data/forcasting.csv')
+
 # plt.show()
 
 import chart_studio

@@ -2,7 +2,7 @@
 # date = "April-03" ==> 04-03
 from datetime import datetime
 from matplotlib import pyplot as plt
-save_graph_folder = "C:\\Users\\KME Hasan\\Documents\\sim_graph\\auto_save\\"
+# save_graph_folder = "C:\\Users\\KME Hasan\\Documents\\sim_graph\\auto_save\\"
 # from linear_regression_on_sird import estimate_coef
 
 data = [['04-03', 203, 5, 2, 2], ['04-04', 434, 9, 2, 2], ['04-05', 367, 18, 5, 5],

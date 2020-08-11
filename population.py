@@ -8,19 +8,19 @@ df_age = pd.read_csv('data/Bangladesh_age_distribution.csv')
 
 df_age['Percentage'] = df_age['Population']*100/df_age['Population'].sum()
 
-# df_age['AgeGroup'] = ['1 - 20', '1 - 20', '1 - 20', '1 - 20', '21 - 40', '21 - 40', '21 - 40', '21 - 40', '41 - 60', '41 - 60', '41 - 60', '41 - 60', '60+', '60+', '60+', '60+', '60+']
-df_age['AgeGroup'] = ['1 - 10', '1 - 10', '11 - 20', '11 - 20', '21 - 30', '21 - 30', '31 - 40', '31 - 40', '41 - 50', '41 - 50', '51 - 60', '51 - 60', '60+', '60+', '60+', '60+', '60+']
+df_age['AgeGroup'] = ['1 - 20', '1 - 20', '1 - 20', '1 - 20', '21 - 40', '21 - 40', '21 - 40', '21 - 40', '41 - 60', '41 - 60', '41 - 60', '41 - 60', '60+', '60+', '60+', '60+', '60+']
+# df_age['AgeGroup'] = ['1 - 10', '1 - 10', '11 - 20', '11 - 20', '21 - 30', '21 - 30', '31 - 40', '31 - 40', '41 - 50', '41 - 50', '51 - 60', '51 - 60', '60+', '60+', '60+', '60+', '60+']
 df = df_age.groupby('AgeGroup').sum()
 
-df['Cases'] = [ 2.9, 7.3, 27.6, 27.1, 17.3, 11.1, 6.7 ]
-df['Deaths'] =[ 1.01, 1.85, 3.52, 8.05, 17.11, 31.38, 37.08 ]
-# df['Cases'] = [ 10.2, 54.6, 28.4, 6.7 ]
-# df['Deaths'] =[ 2.86, 11.57, 48.49, 37.08 ]
+# df['Cases'] = [ 2.9, 7.3, 27.6, 27.1, 17.3, 11.1, 6.7 ]
+# df['Deaths'] =[ 1.01, 1.85, 3.52, 8.05, 17.11, 31.38, 37.08 ]
+df['Cases'] = [ 10.2, 54.6, 28.4, 6.7 ]
+df['Deaths'] =[ 2.86, 11.57, 48.49, 37.08 ]
 
 
 ### values
 divisor = 1e6
-percent_f = 29.0
+percent_f = 29.0/71.0
 
 # predicted distribution of population in 2020
 weight = 170.1/153.0
@@ -31,7 +31,7 @@ print(df[['Population', 'Pop_2020', 'Pop_2020_m']])
 
 # prediction of infected diseases at age 21-30
 m_21_30_infected = df['Pop_2020_m'][2] * 90 / 100.0
-f_21_30_infected = m_21_30_infected * percent_f / 100.0
+f_21_30_infected = m_21_30_infected * percent_f
 
 df['Sus_m'] = df['Cases'] * m_21_30_infected / (df['Cases'][2])
 df['Sus_f'] = df['Cases'] * f_21_30_infected / (df['Cases'][2])
@@ -79,5 +79,5 @@ for i in range(30, 100, 10):
     # plt.ylabel('Frequency (x1 million)')
     # df.plot.bar(y='Susceptible')
     # print(i, df['Sus'].sum()/divisor)
-    print(i, df['Sus'])
+    print(i, df['Sus'], df['Sus'].sum()/divisor)
 plt.show()

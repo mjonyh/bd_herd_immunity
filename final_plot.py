@@ -235,8 +235,9 @@ import chart_studio.tools as tls
 import plotly.express as px
 import plotly.graph_objects as go
 
-username='mjonyh-phy'
-api_key='BeJs4fGTnPuNtmWNWZ5C'
+
+from password import *
+username, api_key = get_plotly_api()
 chart_studio.tools.set_credentials_file(username=username, api_key=api_key)
 
 figure_1 = go.Figure(data=[

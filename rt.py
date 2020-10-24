@@ -1,23 +1,14 @@
-from matplotlib import pyplot as plt
-from matplotlib.dates import date2num, num2date
-from matplotlib import dates as mdates
-from matplotlib import ticker
-from matplotlib.colors import ListedColormap
-from matplotlib.patches import Patch
-
 from scipy import stats as sps
 from scipy.interpolate import interp1d
 import logging
 
 # from IPython.display import clear_output
-import matplotlib.font_manager as fm
 import warnings
 import pandas as pd
 import numpy as np
 import altair as alt
 import sys
 
-from matplotlib.ticker import MaxNLocator
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # %config InlineBackend.figure_format = 'retina'
@@ -35,21 +26,6 @@ else:
     dataSeries = pd.Series(dataset['confirmed_sim'].values, index=dataset['Date'])
 # print(dataSeries)
 
-# datasetxl = pd.read_excel('dataset.xlsx','Sheet1')
-# datasetxl = datasetxl.dropna(how='all', axis='columns')
-# datasetxl = datasetxl.loc[:, ~datasetxl.columns.str.contains('^Unnamed',na=False)]
-# datasetxl = datasetxl.drop([0,67,68,69])
-# datasetxl.to_csv("dataset.csv")
-# datasetxl = pd.read_csv("dataset.csv",header=None)
-# datasetxl = datasetxl.transpose()
-# datasetxl = datasetxl.drop([0,1])
-# datasetxl = datasetxl.reindex(index=datasetxl.index[::-1])
-# datasetxl.columns=["Date","B. Baria","Bagerhat","Bandarban","Barguna","Barisal","Bhola","Bogra","Chandpur","Chapainawabganj","Chattogram","Chuadanga","Cox’s bazar","Cumilla","Dhaka (District)","Dhaka City","Dinajpur","Faridpur","Feni","Gaibandha","Gazipur","Gopalganj","Habiganj","Jamalpur","Jessore","Jhalokathi","Jhenaidah","Joypurhat","Khagrachhari","Khulna","Kishoreganj","Kurigram","Kushtia","Lakshmipur","Lalmonirhat","Madaripur","Magura","Manikganj","Meherpur","Moulvibazar","Munshiganj","Mymensingh","Naogaon","Narail","Narayanganj","Narsingdi","Natore","Netrokona","Nilphamari","Noakhali","Pabna","Panchagarh","Pirojpur","Potuakhali","Rajbari","Rajshahi","Rangamati","Rangpur","Satkhira","Shariatpur","Sherpur","Sirajganj","Sunamganj","Sylhet","Tangail","Thakurgaon","total"]
-# datasetxl['Date'] = pd.to_datetime(datasetxl['Date']).dt.strftime('%Y-%m-%d')
-# districts = ['B. Baria','Bagerhat','Bandarban','Barguna','Barisal','Bhola','Bogra','Chandpur','Chapainawabganj','Chattogram','Chuadanga','Cox’s bazar','Cumilla','Dhaka (District)','Dhaka City','Dinajpur','Faridpur','Feni','Gaibandha','Gazipur','Gopalganj','Habiganj','Jamalpur','Jessore','Jhalokathi','Jhenaidah','Joypurhat','Khagrachhari','Khulna','Kishoreganj','Kurigram','Kushtia','Lakshmipur','Lalmonirhat','Madaripur','Magura','Manikganj','Meherpur','Moulvibazar','Munshiganj','Mymensingh','Naogaon','Narail','Narayanganj','Narsingdi','Natore','Netrokona','Nilphamari','Noakhali','Pabna','Panchagarh','Pirojpur','Potuakhali','Rajbari','Rajshahi','Rangamati','Rangpur','Satkhira','Shariatpur','Sherpur','Sirajganj','Sunamganj','Sylhet','Tangail','Thakurgaon','total']
-# datasetxl[districts] = datasetxl[districts].fillna(0.0)
-# datasetxl[districts] = datasetxl[districts].apply(pd.to_numeric, errors='coerce')
-# datasetxl[districts] = datasetxl[districts].cumsum()
 
 #hide_input
 def prepare_cases(cases, cutoff=5):
@@ -67,29 +43,9 @@ def prepare_cases(cases, cutoff=5):
     
     return original, smoothed
 
-# district_name = 'Dhaka City'
-# district_name = 'Narayanganj'
-
 # dataSeries = pd.Series(datasetxl[district_name].values, index=datasetxl['Date'])
 
 original, smoothed = prepare_cases(dataSeries)
-
-#for district
-# original.plot(title=district_name + " New Cases per Day",
-original.plot(title=" New Cases per Day",
-               c='k',
-               linestyle=':',
-               alpha=.5,
-               label='Actual',
-               legend=True,
-             figsize=(500/72, 300/72))
-
-ax = smoothed.plot(label='Smoothed',
-                   legend=True)
-
-ax.get_figure().set_facecolor('w')
-
-#hide_input
 
 # We create an array for every possible value of Rt
 R_T_MAX = 12
@@ -165,15 +121,6 @@ def get_posteriors(sr, sigma=0.15):
 # Note that we're fixing sigma to a value just for the example
 posteriors, log_likelihood = get_posteriors(smoothed, sigma=.25)
 
-# ax = posteriors.plot(title=district_name + ' - Daily Posterior for $R_t$',
-ax = posteriors.plot(title=' - Daily Posterior for $R_t$',
-           legend=False, 
-           lw=1,
-           c='k',
-           alpha=.3,
-           xlim=(0.4,6))
-
-ax.set_xlabel('$R_t$');
 
 # MLE to find sigma
 sigmas = np.linspace(1/20, 1, 20)
@@ -227,8 +174,6 @@ def highest_density_interval(pmf, p=.9, debug=False):
                      index=['Low_90',
                             'High_90'])
 
-
-
 # Note that this takes a while to execute - it's not the most efficient algorithm
 hdis = highest_density_interval(posteriors, p=.9)
 
@@ -238,95 +183,7 @@ most_likely = posteriors.idxmax().rename('ML')
 result = pd.concat([most_likely, hdis], axis=1)
 
 # print(result)
-
-def plot_rt(result, ax, district_name):
-  
-    ax.set_title(str(district_name))
-  
-    result.to_csv('data/rt_'+sys.argv[1]+'.csv')
-    # Colors
-    ABOVE = [1,0,0]
-    MIDDLE = [1,1,1]
-    BELOW = [0,0,0]
-    cmap = ListedColormap(np.r_[
-        np.linspace(BELOW,MIDDLE,25),
-        np.linspace(MIDDLE,ABOVE,25)
-    ])
-    color_mapped = lambda y: np.clip(y, .5, 1.5)-.5
-  
-    index = result['ML'].index.get_level_values('Date')
-    # print(index, type(index))
-    # index = index.to_datetime()
-    index = pd.to_datetime(index)
-    values = result['ML'].values
-    #print(index)
-  
-    # Plot dots and line
-    ax.plot(index, values, c='k', zorder=1, alpha=.25)
-    ax.scatter(index,
-               values,
-               s=40,
-               lw=.5,
-               c=cmap(color_mapped(values)),
-               edgecolors='k', zorder=2)
-    #"""
-    # Aesthetically, extrapolate credible interval by 1 day either side
-    # lowfn = interp1d(date2num(index.to_datetime()),
-    lowfn = interp1d(date2num(pd.to_datetime(index)),
-                     result['Low_90'].values,
-                     bounds_error=False,
-                     fill_value='extrapolate')
-  
-    highfn = interp1d(date2num(pd.to_datetime(index)),
-                      result['High_90'].values,
-                      bounds_error=False,
-                      fill_value='extrapolate')
-  
-    extended = pd.date_range(start=pd.Timestamp('2020-03-01'),
-                             end=index[-1]+pd.Timedelta(days=1))
-  
-    ax.fill_between(extended,
-                    lowfn(date2num(extended)),
-                    highfn(date2num(extended)),
-                    color='k',
-                    alpha=.1,
-                    lw=0,
-                    zorder=3)
-
-    ax.axhline(1.0, c='k', lw=1, label='$R_t=1.0$', alpha=.25);
-  
-    # Formatting
-    ax.xaxis.set_major_locator(mdates.MonthLocator())
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-    ax.xaxis.set_minor_locator(mdates.DayLocator())
-  
-    ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
-    ax.yaxis.set_major_formatter(ticker.StrMethodFormatter("{x:.1f}"))
-    ax.yaxis.tick_right()
-    ax.spines['left'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.margins(0)
-    ax.grid(which='major', axis='y', c='k', alpha=.1, zorder=-2)
-    ax.margins(0)
-    ax.set_ylim(0.0, 5.0)
-    ax.set_xlim(pd.Timestamp('2020-03-01'), pd.Timestamp(result.index.get_level_values('Date')[-1])+pd.Timedelta(days=1))
-    #"""
-    fig.set_facecolor('w')
-    fig.savefig('bangladesh-rt.png')  
-
-fig, ax = plt.subplots(figsize=(600/72,400/72))
-#result.index = pd.to_datetime(result.index)
-
-# plot_rt(result, ax, district_name)
-plot_rt(result, ax, 'Bangladesh')
-_ = plt.xticks(rotation=45, ha='right')
-#_ = plt.xticks(np.arange(0, len(dates), step=3))
-# ax.set_title('Real-time $R_t$ for ' + district_name)
-ax.set_title('Real-time $R_t$ for ')
-ax.xaxis.set_major_locator(mdates.WeekdayLocator())
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
-
+result.to_csv('data/rt_'+sys.argv[1]+'.csv')
 
 ### Doubling
 print(original.index.to_numpy())
@@ -359,18 +216,6 @@ data = {
 
 df = pd.DataFrame(data)
 df.to_csv('data/doublingtimes_'+sys.argv[1]+'.csv')
-
-plt.figure(figsize=(6, 4))
-plt.autoscale(enable=True, axis='x', tight=True)
-plt.rcParams.update({'font.size': 12})
-plt.plot(dates, doublingtimes)#, '-', color="#348ABD", label='$Herd Immunity$', lw=4)
-plt.xlabel('Date Range')
-plt.ylabel('Doubling Time for ')
-_ = plt.xticks(rotation=45, ha='right')
-_ = plt.xticks(np.arange(0, len(dates), step=3))
-
-
-
 
 # plt.show()
 

@@ -2,10 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns;sns.set()
 
-# df = pd.read_csv('https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df = pd.read_csv('data/owid-covid-data.csv')
+df = pd.read_csv('https://covid.ourworldindata.org/data/owid-covid-data.csv')
+# df = pd.read_csv('data/owid-covid-data.csv')
 df = df[df['location']=='Bangladesh']
 df['date'] = pd.to_datetime(df['date'])
+
+df.to_csv('data/tpr.csv', index=False)
 
 fig, ax1 = plt.subplots(1)
 
@@ -32,8 +34,6 @@ ax2.tick_params(axis='y',labelcolor=color)
 ax2.legend(handles=[l1, l2, l3], loc=2)
 fig.tight_layout()
 plt.show()
-
-
 
 
 import plotly.graph_objects as go

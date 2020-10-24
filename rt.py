@@ -2,7 +2,6 @@ from scipy import stats as sps
 from scipy.interpolate import interp1d
 import logging
 
-# from IPython.display import clear_output
 import warnings
 import pandas as pd
 import numpy as np
@@ -10,9 +9,6 @@ import altair as alt
 import sys
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
-
-# %config InlineBackend.figure_format = 'retina'
-# %matplotlib inline
 
 # dataset = pd.read_csv('datasetcv.csv')
 dataset = pd.read_csv('data/Bangladesh_90_'+sys.argv[1]+'.csv')

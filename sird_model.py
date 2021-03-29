@@ -28,6 +28,7 @@ class Model:
     SIRD model of Covid-19.
     """
 
+<<<<<<< HEAD
     # __CONFIRMED_URL = 'https://bit.ly/35yJO0d'
     __CONFIRMED_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
     __CONFIRMED_URL_DATA = pd.read_csv(__CONFIRMED_URL)
@@ -36,6 +37,13 @@ class Model:
     __RECOVERED_URL_DATA = pd.read_csv(__RECOVERED_URL)
     # __DEATHS_URL = 'https://bit.ly/2L0hzxQ'
     __DEATHS_URL = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
+=======
+    __CONFIRMED_URL = 'https://bit.ly/35yJO0d'
+    __CONFIRMED_URL_DATA = pd.read_csv(__CONFIRMED_URL)
+    __RECOVERED_URL = 'https://bit.ly/2L6jLE9'
+    __RECOVERED_URL_DATA = pd.read_csv(__RECOVERED_URL)
+    __DEATHS_URL = 'https://bit.ly/2L0hzxQ'
+>>>>>>> b524199def02b9575a7003c77986bd21ed31654b
     __DEATHS_URL_DATA = pd.read_csv(__DEATHS_URL)
     __POPULATION_URL = 'https://bit.ly/2WYjZCD'
     __JHU_DATA_SHIFT = 4

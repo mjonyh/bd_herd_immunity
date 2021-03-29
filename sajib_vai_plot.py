@@ -1,9 +1,32 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 import seaborn as sns
 sns.set()
+
+from scipy.stats import linregress
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+def data_plot(x, y, color, label, ax=plt):
+    mask = ~np.isnan(x) & ~np.isnan(y)
+    stats = linregress(x[mask], y[mask])
+    print(stats)
+
+    m = stats.slope
+    b = stats.intercept
+    # err = stats.stderr/2
+    r2 = stats.rvalue*stats.rvalue
+    p = stats.pvalue
+    # label = 'm: {:.2}, $R^2$: {:.2}'.format(m, r2)
+    label = '$R^2$: {:.2}'.format(r2)
+
+    ax.scatter(x, y, marker='.', color=color, label=None)
+    l, = ax.plot(x, m * x + b, color=color, label=label)
+    # ax.fill_between(x, m*x+b+err, m*x+b-err, alpha=0.2, color=color)
+    return l
 
 import chart_studio
 import chart_studio.plotly as py
@@ -16,6 +39,20 @@ def convert_numeric(df, date_column):
     df[date_column] = pd.to_datetime(df[date_column])
     return df
 
+def annot_max(x,y, ax=None, color='k'):
+    xmax = x.iloc[-1]
+    ymax = y.iloc[-1]
+    # xmax = x[np.argmax(y)]
+    # ymax = y.max()
+    # text= "x={:.3f}, y={:.3f}".format(xmax, ymax)
+    text= "{:.2f}".format(ymax)
+    if not ax:
+        ax=plt.gca()
+    bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec=color, lw=0.72)
+    arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=60", color=color)
+    kw = dict(xycoords='data',textcoords="axes fraction",
+              arrowprops=arrowprops, bbox=bbox_props, ha="right", va="top", color=color)
+    ax.annotate(text, xy=(xmax, ymax), xytext=(0.94,0.46), **kw)
 
 def graph_plot(x, y, tag, ax):
     # plt.figure(tag[0])
@@ -39,6 +76,7 @@ tag = [figure_no, plot/semilogy, color+linestyle, label, ylabel]
 '''
 
 files = ['Bangladesh_90', 'Bangladesh_30']
+# files = ['Bangladesh_90']
 population = ['53M', '18M', 'HR (53M)', 'HR (18M)']
 marker = ['k-', 'k-.', 'g-', 'g-.', 'r-', 'r-.', 'b-', 'b-.', 'm-', 'm-.']
 linestyle = ['-', '-.']
@@ -69,8 +107,13 @@ df_doublings_2 = convert_numeric(df_doublings_2, 'date')
 df_isolation = pd.read_csv('data/isolation.csv')
 df_isolation = convert_numeric(df_isolation, 'date')
 
+# df_owid = pd.read_csv('https://covid.ourworldindata.org/data/owid-covid-data.csv')
+df_owid = pd.read_csv('owid-covid-data.csv')
+df_owid = df_owid[df_owid['location']=='Bangladesh']
+df_owid['date'] = pd.to_datetime(df_owid['date'])
+
 ### mobility https://www.google.com/covid19/mobility/
-df_mobility = pd.read_csv('data/test.csv')
+df_mobility = pd.read_csv('data/google_mobility.csv')
 df_mobility = df_mobility[df_mobility['country_region_code']=='BD']
 df_mobility = df_mobility[['date','retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline']]
 df_mobility_mean = df_mobility[['retail_and_recreation_percent_change_from_baseline','grocery_and_pharmacy_percent_change_from_baseline','parks_percent_change_from_baseline','transit_stations_percent_change_from_baseline','workplaces_percent_change_from_baseline']]
@@ -78,6 +121,8 @@ df_mobility['mean'] = df_mobility_mean.mean(axis=1)
 # print(df_mobility.head())
 df_mobility = convert_numeric(df_mobility, 'date')
 # df_mobility.plot(x='date')
+
+# df_mobility.plot(x='date', y='mean')
 
 data = {'Cases': [ 10.2, 54.6, 28.4, 6.7 ],
         'Deaths': [ 2.86, 11.57, 48.49, 37.08 ],
@@ -91,6 +136,10 @@ hospital_beds = 7034
 
 fig1, ax1 = plt.subplots(1, 1, figsize=(6.4, 4))
 fig2, ax2 = plt.subplots(1, 1, figsize=(6.4, 4))
+fig3, axs = plt.subplots(1, 1, figsize=(6.4, 4), sharey=True)
+fig4, axs1 = plt.subplots(1, 2, figsize=(6.4, 4), sharey=True)
+
+xmax_limit = '2021-04-01'
 
 for i in range(len(files)):
 
@@ -104,14 +153,16 @@ for i in range(len(files)):
 
     ### cases
     if (i<1):
-        tag = [11, 'semilogy', 'kx', None, None]
+        tag = [11, 'semilogy', 'k.', None, None]
         graph_plot(df_1['days'], df_1['active'], tag, ax1)       # active cases
-        tag = [11, 'semilogy', 'mx', None, None]
+        tag = [11, 'semilogy', 'm.', None, None]
         graph_plot(df_1['days'], df_1['confirmed'].diff(), tag, ax1)       # growth cases
-        tag = [11, 'semilogy', 'rx', None, None]
+        tag = [11, 'semilogy', 'g.', None, None]
+        graph_plot(df_1['days'], df_1['confirmed'], tag, ax1)       # growth cases
+        tag = [11, 'semilogy', 'r.', None, None]
         graph_plot(df_1['days'], df_1['deaths'], tag, ax1)       # death cases
-        ax1.axhline(hospital_beds, color='black', linestyle='dotted')
-        ax1.text('2020-03-01', hospital_beds*1.2, 'Covid Beds', size=10)
+        # ax1.axhline(hospital_beds, color='black', linestyle='dotted')
+        # ax1.text('2020-03-01', hospital_beds*1.2, 'Covid Beds', size=10)
         # tag = [11, 'semilogy', 'gx', None, None]
         # graph_plot(home_isolation_date, home_isolation, tag)
         # graph_plot(df_isolation['date'], df_isolation['isolation'], tag)
@@ -124,32 +175,38 @@ for i in range(len(files)):
 
 
     ### active cases
-    tag = [11, 'semilogy', marker[i], 'A ('+population[i]+')', None]
+    tag = [11, 'semilogy', marker[i], 'Active ', None]
     graph_plot(df_2['days_sim'], df_2['active_sim'], tag, ax1)
 
-    ### hospital required
-    tag = [11, 'semilogy', marker[i+2], 'HR ('+population[i]+')', None]
-    graph_plot(df_2['days_sim'], df_2['active_sim']*16/100, tag, ax1)
+    # ### hospital required
+    # tag = [11, 'semilogy', marker[i+2], 'HR ('+population[i]+')', None]
+    # graph_plot(df_2['days_sim'], df_2['active_sim']*16/100, tag, ax1)
 
     ### Death Cases
-    tag = [11, 'semilogy', marker[i+4], 'D ('+population[i]+')', 'Number of Cases']
+    tag = [11, 'semilogy', marker[i+4], 'Deaths ', None]
     graph_plot(df_2['days_sim'], df_2['deaths_sim'], tag, ax1)
 
     # ### susceptible Cases
     # tag = [11, 'semilogy', marker[i+6], 'S ('+population[i]+')', 'Number of Cases']
     # graph_plot(df_2['days_sim'], df_2['susceptible_sim'], tag)
 
-    ### growth cases
-    tag = [11, 'semilogy', marker[i+8], 'G ('+population[i]+')', 'Number of Cases']
+    ### confirmed cases
+    tag = [11, 'semilogy', marker[i+2], 'Confirmed ', None]
+    graph_plot(df_2['days_sim'], df_2['confirmed_sim'], tag, ax1)
+
+    ### Daily cases
+    tag = [11, 'semilogy', marker[i+8], 'Daily Cases ', None]
     graph_plot(df_2['days_sim'], df_2['confirmed_sim'].diff(), tag, ax1)
-    g_max = df_2['confirmed_sim'].diff().max()
-    ax1.axhline(g_max, color='m', linestyle=':')
-    ax1.text('2020-03-01', g_max*1.2, '$G_{max}$: '+str(int(g_max/1e3))+'K', size=10)
+    # g_max = df_2['confirmed_sim'].diff().max()
+    # ax1.axhline(g_max, color='m', linestyle=':')
+    # ax1.text('2020-03-01', g_max*1.2, '$G_{max}$: '+str(int(g_max/1e3))+'K', size=10)
 
     # print(int(df_2['confirmed_sim'][df_2['days_sim']=='2020-09-01'].values[0]))
 
+    ax1.set_ylabel('Cases')
+
     ax1.set_ylim(bottom=1, top=1e6)
-    ax1.set_xlim(xmin='2020-03-01', xmax='2021-04-01')
+    ax1.set_xlim(xmin='2020-03-01', xmax=xmax_limit)
     # plt.xlim(xmin='2020-03-01')
     ax1.legend(ncol=2, fancybox=True, framealpha=0.2)
 
@@ -171,67 +228,98 @@ for i in range(len(files)):
         # % Restarting economy: 30th May, 2020: https://bdnews24.com/bangladesh/2020/05/29/bangladesh-set-to-step-into-coronavirus-new-normal-with-a-lot-at-stake
 
         ### mobility
-        # tag = [12, 'plot', 'k-', 'Drops in Mobility (x10)', None]
-        # graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2)
-        ax2.plot(df_mobility['date'], -df_mobility['mean']/10, color=color)
-        l1, = ax2.plot(df_mobility['date'], -df_mobility['mean']/10, color=color, marker='^', label='Drops in Mobility (x10)')
+        tag = [12, 'plot', 'k-', 'Drops in Mobility (x10)', None]
+        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2)
+        tag = [12, 'plot', 'k.', None, None]
+        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2)
+        # ax2.plot(df_mobility['date'], -df_mobility['mean']/10, color=color)
+        # l1, = ax2.plot(df_mobility['date'], -df_mobility['mean']/10, color=color, marker='^', label='Drops in Mobility (x10)')
 
-        # ### growth
-        # tag = [12, 'plot', 'b-', 'Daily Growth (x1K)', None]
-        # graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
-        # tag = [12, 'plot', 'b.', None, None]
-        # graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
+        ### growth
+        tag = [12, 'plot', 'b-', 'Daily Cases (x1K)', None]
+        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
+        tag = [12, 'plot', 'b.', None, None]
+        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
 
-        # ### doublingtimes
-        # tag = [12, 'plot', 'g-', 'Doubling Time (x10)', None]
-        # graph_plot(df_doublings_1['date'], df_doublings_1['doublingtimes']/10, tag, ax2)
+        ### Test Positive Rate
+        tag = [12, 'plot', 'g-', 'Test Positive Rate (x10 in %)', None]
+        graph_plot(df_owid['date'], df_owid['positive_rate']*10, tag, ax2)
+        tag = [12, 'plot', 'g.', None, None]
+        graph_plot(df_owid['date'], df_owid['positive_rate']*10, tag, ax2)
+
+
+        ### doublingtimes
+        # tag = [12, 'plot', 'g-', 'Doubling Time (x100)', None]
+        # graph_plot(df_doublings_1['date'], df_doublings_1['doublingtimes']/100, tag, ax2)
         # tag = [12, 'plot', 'g.', None, None]
-        # graph_plot(df_doublings_1['date'], df_doublings_1['doublingtimes']/10, tag, ax2)
+        # graph_plot(df_doublings_1['date'], df_doublings_1['doublingtimes']/100, tag, ax2)
 
-        # ### lock down
-        # text_position = 4.5
-        # line_max = 6
-        # ax2.vlines(x='2020-03-26', ymin=0, ymax=line_max, color='black', alpha=0.5)
+        ### lock down
+        text_position = 6.5
+        text_position_down = 4.5
+        line_max = 7
+        line_min = -2
+        ax2.vlines(x='2020-03-26', ymin=line_min, ymax=line_max, color='black', alpha=0.5)
         # ax2.text('2020-03-27', text_position, '$L_1$\nC: 44\nD: 5', size=10)
-        # ax2.vlines('2020-04-26', ymin=0, ymax=line_max, color='k', alpha=0.5)
+        ax2.text('2020-03-27', text_position, '$L_1$', size=10)
+        ax2.vlines('2020-04-26', ymin=line_min, ymax=line_max, color='k', alpha=0.5)
+        ax2.text('2020-04-27', text_position, '$L_2$', color='black', size=10)
         # ax2.text('2020-04-27', text_position, '$L_2$\nC: 5416\nD: 145', color='black', size=10)
-        # ax2.vlines('2020-05-10', color='k', alpha=0.5, ymin=0, ymax=line_max)
+        ax2.vlines('2020-05-10', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2.text('2020-05-11', text_position, '$L_3$', color='black', size=10)
         # ax2.text('2020-05-11', text_position, '$L_3$\nC: 14657\nD: 228', color='black', size=10)
-        # ax2.vlines('2020-05-30', color='k', alpha=0.5, ymin=0, ymax=line_max)
+        ax2.vlines('2020-05-30', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2.text('2020-05-31', text_position, '$L_4$', color='black', size=10)
         # ax2.text('2020-05-31', text_position, '$L_4$\nC: 44608\nD: 610', color='black', size=10)
+        ### Eid ul Adha
+        ax2.vlines('2020-07-31', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2.text('2020-08-01', text_position, '$L_5$', color='black', size=10)
+        ### durga puja
+        ax2.vlines('2020-10-26', color='k', alpha=0.5, ymin=line_min, ymax=line_max-3)
+        ax2.text('2020-10-27', text_position-3, '$L_6$', color='black', size=10)
+        ### No more free test
+        ax2.vlines('2020-06-30', color='r', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2.text('2020-07-01', text_position, '$G_1$', color='r', size=10)
+        ### Winter
+        ax2.vlines('2020-11-15', color='r', alpha=0.5, ymin=line_min, ymax=line_max-3)
+        ax2.text('2020-11-16', text_position-3, 'Winter', color='r', size=10)
 
         ### Rt
-        # tag = [12, 'plot', 'b-', '$R_t$', None]
-        # graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
-        ax2.plot(df_rt_1['Date'], df_rt_1['ML'], color=color)
-        l2, = ax2.plot(df_rt_1['Date'], df_rt_1['ML'], color=color, marker='.', label='$R_t$')
-        # tag = [12, 'plot', 'r.', None, None]
-        # graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
+        tag = [12, 'plot', 'r-', '$R_t$', None]
+        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
+        # ax2.plot(df_rt_1['Date'], df_rt_1['ML'], color=color)
+        # l2, = ax2.plot(df_rt_1['Date'], df_rt_1['ML'], color=color, marker='.', label='$R_t$')
+        tag = [12, 'plot', 'r.', None, None]
+        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
+        annot_max(df_rt_1['Date'], df_rt_1['ML'], ax2, 'r')
 
         test = ax2.fill_between(df_rt_1['Date'], df_rt_1['Low_90'], df_rt_1['High_90'], alpha=0.5, color='r')
 
-        ax2.set_ylabel('Magnitude', color=color)
-        ax2.tick_params(axis='y',labelcolor=color)
+        # ax2.set_ylabel('Magnitude', color=color)
+        # ax2.tick_params(axis='y',labelcolor=color)
 
         df = pd.read_csv('data/owid-covid-data.csv')
         df = df[df['location']=='Bangladesh']
         df['date'] = pd.to_datetime(df['date'])
 
-        ax3 = ax2.twinx()
-        color = 'tab:blue'
+        # ax3 = ax2.twinx()
+        # color = 'tab:blue'
 
-        ax3.plot(df['date'], df['positive_rate']*100, color=color)
-        l3, = ax3.plot(df['date'], df['positive_rate']*100, color=color, marker='.', label='Positive Test Rate (in %)')
-        ax3.set_ylim(0, 40)
-        ax3.set_ylabel("Positive Test Rate (in %)",color=color)
-        ax3.tick_params(axis='y',labelcolor=color)
+        # ax3.plot(df['date'], df['positive_rate']*100, color=color)
+        # l3, = ax3.plot(df['date'], df['positive_rate']*100, color=color, marker='.', label='Positive Test Rate (in %)')
+        # ax3.set_ylim(0, 40)
+        # ax3.set_ylabel("Positive Test Rate (in %)",color=color)
+        # ax3.tick_params(axis='y',labelcolor=color)
 
-        ax3.legend(handles=[l1, l2, l3], loc=2, ncol=2)
-        fig2.tight_layout()
+        # ax3.legend(handles=[l1, l2, l3], loc=2, ncol=2)
+        # fig2.tight_layout()
 
-    ax2.set_xlim(xmin='2020-03-15', xmax='2020-09-01')
+    ax2.set_xlim(xmin='2020-03-15', xmax=xmax_limit)
     # ax2.legend(ncol=2, framealpha=0.2, loc='upper right')
-    ax2.set_ylim(bottom=0, top=8)
+    ax2.set_ylim(bottom=line_min, top=line_max)
+    # plt.xticks(rotation=45)
+    ax2.tick_params(axis='x', labelrotation=45 )
+
 
     if(i==0):
         last_data_date = (df_1['days'].iloc[len(df_1)-1])
@@ -248,6 +336,42 @@ for i in range(len(files)):
         save_df['DT'] = doubling_array
 
         save_df.to_csv('data/forcasting.csv', index=False)
+
+
+merged = pd.merge(df_2.set_index('days_sim'), df_owid.set_index('date'), how='inner', left_index=True, right_index=True)
+merged = pd.merge(merged, df_rt_1.set_index('Date'), how='inner', left_index=True, right_index=True)
+# merged = merged[merged['cfr_recovered_sim']<15]
+# print(merged)
+# merged['daily_recovered'] = merged['recovered_sim'].diff()
+
+data_plot(merged['confirmed_sim'].pct_change(), merged['ML'], 'k', None, axs)
+axs.set_ylabel('$R_t$')
+axs.set_xlabel('Percentage of Changes in Confirmed Cases')
+axs.tick_params(axis='x', labelrotation=45 )
+axs.legend()
+# data_plot(merged['confirmed_sim'].diff(), merged['positive_rate']*100, 'k', None, axs)
+# axs.set_ylabel('Test Positive Rate (in %)')
+# axs.set_xlabel('Daily Cases')
+# axs.tick_params(axis='x', labelrotation=45 )
+# axs.legend()
+# data_plot(merged['recovered_sim'].diff(), merged['positive_rate']*100, 'g', None, axs[1])
+# axs[1].set_xlabel('Test Positive Rate')
+# axs[1].tick_params(axis='x', labelrotation=45 )
+# axs[1].legend()
+# data_plot(merged['deaths_sim'].diff(), merged['positive_rate']*100, 'b', None, axs[2])
+# axs[2].set_xlabel('Test Positive Rate')
+# axs[2].tick_params(axis='x', labelrotation=45 )
+# axs[2].legend()
+merged = merged[merged['recovered_sim'] < 30000]
+data_plot(merged['recovered_sim'].diff(), merged['confirmed_sim'].diff(), 'g', None, axs1[0])
+axs1[0].set_ylabel('Daily Cases')
+axs1[0].set_xlabel('Daily Recovered Cases')
+axs1[0].tick_params(axis='x', labelrotation=45 )
+axs1[0].legend()
+data_plot(merged['deaths_sim'].diff(), merged['confirmed_sim'].diff(), 'r', None, axs1[1])
+axs1[1].set_xlabel('Daily Deaths')
+axs1[1].tick_params(axis='x', labelrotation=45 )
+axs1[1].legend()
 
 plt.show()
 

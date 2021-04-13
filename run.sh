@@ -19,5 +19,5 @@ python3 rt.py 1
 python3 rt.py 2
 
 ### Plot the data
-python3 final_plot.py
-python3 owid_data.py
+# python3 final_plot.py
+# python3 owid_data.py

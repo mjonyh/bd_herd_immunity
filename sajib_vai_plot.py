@@ -135,7 +135,7 @@ df = pd.DataFrame(data)
 hospital_beds = 7034
 
 fig1, ax1 = plt.subplots(1, 1, figsize=(6.4, 4))
-fig2, ax2 = plt.subplots(1, 1, figsize=(6.4, 4))
+fig2, ax2 = plt.subplots(2, 1, figsize=(6.4, 8), sharex=True)
 fig3, axs = plt.subplots(1, 1, figsize=(6.4, 4), sharey=True)
 fig4, axs1 = plt.subplots(1, 2, figsize=(6.4, 4), sharey=True)
 
@@ -229,23 +229,23 @@ for i in range(len(files)):
 
         ### mobility
         tag = [12, 'plot', 'k-', 'Drops in Mobility (x10)', None]
-        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2)
+        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2[0])
         tag = [12, 'plot', 'k.', None, None]
-        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2)
+        graph_plot(df_mobility['date'], -df_mobility['mean']/10, tag, ax2[0])
         # ax2.plot(df_mobility['date'], -df_mobility['mean']/10, color=color)
         # l1, = ax2.plot(df_mobility['date'], -df_mobility['mean']/10, color=color, marker='^', label='Drops in Mobility (x10)')
 
         ### growth
         tag = [12, 'plot', 'b-', 'Daily Cases (x1K)', None]
-        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
+        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2[0])
         tag = [12, 'plot', 'b.', None, None]
-        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2)
+        graph_plot(df_1['days'], df_1['confirmed'].diff()/1000, tag, ax2[0])
 
         ### Test Positive Rate
         tag = [12, 'plot', 'g-', 'Test Positive Rate (x10 in %)', None]
-        graph_plot(df_owid['date'], df_owid['positive_rate']*10, tag, ax2)
+        graph_plot(df_owid['date'], df_owid['positive_rate']*10, tag, ax2[0])
         tag = [12, 'plot', 'g.', None, None]
-        graph_plot(df_owid['date'], df_owid['positive_rate']*10, tag, ax2)
+        graph_plot(df_owid['date'], df_owid['positive_rate']*10, tag, ax2[0])
 
 
         ### doublingtimes
@@ -259,41 +259,41 @@ for i in range(len(files)):
         text_position_down = 4.5
         line_max = 7
         line_min = -2
-        ax2.vlines(x='2020-03-26', ymin=line_min, ymax=line_max, color='black', alpha=0.5)
+        ax2[0].vlines(x='2020-03-26', ymin=line_min, ymax=line_max, color='black', alpha=0.5)
         # ax2.text('2020-03-27', text_position, '$L_1$\nC: 44\nD: 5', size=10)
-        ax2.text('2020-03-27', text_position, '$L_1$', size=10)
-        ax2.vlines('2020-04-26', ymin=line_min, ymax=line_max, color='k', alpha=0.5)
-        ax2.text('2020-04-27', text_position, '$L_2$', color='black', size=10)
+        ax2[0].text('2020-03-27', text_position, '$L_1$', size=10)
+        ax2[0].vlines('2020-04-26', ymin=line_min, ymax=line_max, color='k', alpha=0.5)
+        ax2[0].text('2020-04-27', text_position, '$L_2$', color='black', size=10)
         # ax2.text('2020-04-27', text_position, '$L_2$\nC: 5416\nD: 145', color='black', size=10)
-        ax2.vlines('2020-05-10', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
-        ax2.text('2020-05-11', text_position, '$L_3$', color='black', size=10)
+        ax2[0].vlines('2020-05-10', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2020-05-11', text_position, '$L_3$', color='black', size=10)
         # ax2.text('2020-05-11', text_position, '$L_3$\nC: 14657\nD: 228', color='black', size=10)
-        ax2.vlines('2020-05-30', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
-        ax2.text('2020-05-31', text_position, '$L_4$', color='black', size=10)
+        ax2[0].vlines('2020-05-30', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2020-05-31', text_position, '$L_4$', color='black', size=10)
         # ax2.text('2020-05-31', text_position, '$L_4$\nC: 44608\nD: 610', color='black', size=10)
         ### Eid ul Adha
-        ax2.vlines('2020-07-31', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
-        ax2.text('2020-08-01', text_position, '$L_5$', color='black', size=10)
+        ax2[0].vlines('2020-07-31', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2020-08-01', text_position, '$L_5$', color='black', size=10)
         ### durga puja
-        ax2.vlines('2020-10-26', color='k', alpha=0.5, ymin=line_min, ymax=line_max-3)
-        ax2.text('2020-10-27', text_position-3, '$L_6$', color='black', size=10)
+        ax2[0].vlines('2020-10-26', color='k', alpha=0.5, ymin=line_min, ymax=line_max-3)
+        ax2[0].text('2020-10-27', text_position-3, '$L_6$', color='black', size=10)
         ### No more free test
-        ax2.vlines('2020-06-30', color='r', alpha=0.5, ymin=line_min, ymax=line_max)
-        ax2.text('2020-07-01', text_position, '$G_1$', color='r', size=10)
+        ax2[0].vlines('2020-06-30', color='r', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2020-07-01', text_position, '$G_1$', color='r', size=10)
         ### Winter
-        ax2.vlines('2020-11-15', color='r', alpha=0.5, ymin=line_min, ymax=line_max-3)
-        ax2.text('2020-11-16', text_position-3, 'Winter', color='r', size=10)
+        ax2[0].vlines('2020-11-15', color='r', alpha=0.5, ymin=line_min, ymax=line_max-3)
+        ax2[0].text('2020-11-16', text_position-3, 'Winter', color='r', size=10)
 
         ### Rt
         tag = [12, 'plot', 'r-', '$R_t$', None]
-        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
+        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2[0])       # active cases
         # ax2.plot(df_rt_1['Date'], df_rt_1['ML'], color=color)
         # l2, = ax2.plot(df_rt_1['Date'], df_rt_1['ML'], color=color, marker='.', label='$R_t$')
         tag = [12, 'plot', 'r.', None, None]
-        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2)       # active cases
-        annot_max(df_rt_1['Date'], df_rt_1['ML'], ax2, 'r')
+        graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2[0])       # active cases
+        annot_max(df_rt_1['Date'], df_rt_1['ML'], ax2[0], 'r')
 
-        test = ax2.fill_between(df_rt_1['Date'], df_rt_1['Low_90'], df_rt_1['High_90'], alpha=0.5, color='r')
+        test = ax2[0].fill_between(df_rt_1['Date'], df_rt_1['Low_90'], df_rt_1['High_90'], alpha=0.5, color='r')
 
         # ax2.set_ylabel('Magnitude', color=color)
         # ax2.tick_params(axis='y',labelcolor=color)
@@ -314,11 +314,11 @@ for i in range(len(files)):
         # ax3.legend(handles=[l1, l2, l3], loc=2, ncol=2)
         # fig2.tight_layout()
 
-    ax2.set_xlim(xmin='2020-03-15', xmax=xmax_limit)
+    ax2[0].set_xlim(xmin='2020-03-15', xmax=xmax_limit)
     # ax2.legend(ncol=2, framealpha=0.2, loc='upper right')
-    ax2.set_ylim(bottom=line_min, top=line_max)
+    ax2[0].set_ylim(bottom=line_min, top=line_max)
     # plt.xticks(rotation=45)
-    ax2.tick_params(axis='x', labelrotation=45 )
+    ax2[0].tick_params(axis='x', labelrotation=45 )
 
 
     if(i==0):
@@ -372,6 +372,19 @@ data_plot(merged['deaths_sim'].diff(), merged['confirmed_sim'].diff(), 'r', None
 axs1[1].set_xlabel('Daily Deaths')
 axs1[1].tick_params(axis='x', labelrotation=45 )
 axs1[1].legend()
+
+df = pd.read_csv('zone_risk.csv')
+df.date = pd.to_datetime(df.date)
+
+df.plot(x='date', y=['green', 'yellow', 'orange', 'red'], ax= ax2[1],
+        color = ['#54b45f', '#ecd424', '#f88c51', '#c01a27'],
+        label = ['Trivial', 'Community Spread', 'Accelerated Spread', 'Tipping Point'],
+        ylabel='Number of Districts'
+        )
+ax2[0].set_ylabel('Magnitude')
+ax2[0].legend(loc='upper center', ncol=2, bbox_to_anchor=(0.5, 1.2, 0, 0))
+ax2[1].legend(loc='upper center', ncol=2, bbox_to_anchor=(0.5, 1.2, 0, 0))
+# ax.legend(loc=9, ncol=2, bbox_to_anchor=(0.5, 1.2, 0, 0))
 
 plt.show()
 

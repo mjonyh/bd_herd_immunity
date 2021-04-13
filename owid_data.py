@@ -1,6 +1,26 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns;sns.set()
+import numpy as np
+from scipy.stats import linregress
+
+def data_plot(x, y, color, label, ax=plt):
+        mask = ~np.isnan(x) & ~np.isnan(y)
+        stats = linregress(x[mask], y[mask])
+        print(stats)
+
+        m = stats.slope
+        b = stats.intercept
+        r2 = stats.rvalue*stats.rvalue
+        p = stats.pvalue
+        label = 'm: {:.2}, $R^2$: {:.2}'.format(m, r2)
+        # label = '$R^2$: {:.2}'.format(r2)
+
+        ax.scatter(x, y, marker='.', color=color, label=None)
+        l, = ax.plot(x, m * x + b, color=color, label=label)
+        # ax.fill_between(x, m*x+b+err, m*x+b-err, alpha=0.2, color=color)
+        ax.set_title(label)
+        return m
 
 df = pd.read_csv('https://covid.ourworldindata.org/data/owid-covid-data.csv')
 # df = pd.read_csv('owid-covid-data.csv')
@@ -34,6 +54,23 @@ ax2.tick_params(axis='x', rotation=45)
 
 ax2.legend(handles=[l1, l2, l3], loc=1, framealpha=0.5)
 fig.tight_layout()
+
+# df = df[df['new_cases'] > 1000]
+df.positive_rate = df.positive_rate 
+fig3, axs3 = plt.subplots(1, 3, figsize=(24, 5))
+data_plot(df.new_tests, df.new_cases, 'r', None, axs3[0])
+data_plot(df.new_cases, df.positive_rate, 'r', None, axs3[1])
+data_plot(df.new_cases, df.positive_rate*df.new_cases, 'r', None, axs3[2])
+axs3[0].set_ylabel('Daily Cases')
+axs3[0].set_xlabel('Daily Tests')
+axs3[1].set_xlabel('Daily Cases')
+axs3[1].set_ylabel('TPR')
+axs3[2].set_xlabel('Daily Cases')
+axs3[2].set_ylabel('TPR x Cases')
+
+# plt.figure()
+
+# df.plot(kind='scatter', x='new_cases', y='positive_rate')
 
 
 # df_rt_1 = pd.read_csv('data/rt_1.csv')

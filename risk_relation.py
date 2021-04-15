@@ -114,7 +114,7 @@ df_isolation = pd.read_csv('data/isolation.csv')
 df_isolation = convert_numeric(df_isolation, 'date')
 
 # df_owid = pd.read_csv('https://covid.ourworldindata.org/data/owid-covid-data.csv')
-df_owid = pd.read_csv('owid-covid-data.csv')
+df_owid = pd.read_csv('data/2021-04-14_owid.csv')
 df_owid = df_owid[df_owid['location']=='Bangladesh']
 df_owid['date'] = pd.to_datetime(df_owid['date'])
 
@@ -189,22 +189,22 @@ for i in range(len(files)):
         # graph_plot(df_doublings_1['date'], df_doublings_1['doublingtimes']/100, tag, ax2)
 
         ### lock down
-        text_position = 7.5
+        text_position = 8.5
         text_position_down = 4.5
         line_max = 10
         line_min = -2
-        ax2[0].vlines(x='2020-03-26', ymin=line_min, ymax=line_max, color='black', alpha=0.5)
-        # ax2.text('2020-03-27', text_position, '$L_1$\nC: 44\nD: 5', size=10)
+        ### First locked down
+        ax2[0].vlines('2020-03-26', ymin=line_min, ymax=line_max, color='k', alpha=0.5)
         ax2[0].text('2020-03-27', text_position, '$L_1$', size=10)
+        ### Reopen Garments Factory
         ax2[0].vlines('2020-04-26', ymin=line_min, ymax=line_max, color='k', alpha=0.5)
         ax2[0].text('2020-04-27', text_position, '$L_2$', color='black', size=10)
-        # ax2.text('2020-04-27', text_position, '$L_2$\nC: 5416\nD: 145', color='black', size=10)
+        ### Shopping Mall reopened (Eid-ul-Fitr)
         ax2[0].vlines('2020-05-10', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
         ax2[0].text('2020-05-11', text_position, '$L_3$', color='black', size=10)
-        # ax2.text('2020-05-11', text_position, '$L_3$\nC: 14657\nD: 228', color='black', size=10)
+        ### Restarting economy
         ax2[0].vlines('2020-05-30', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
         ax2[0].text('2020-05-31', text_position, '$L_4$', color='black', size=10)
-        # ax2.text('2020-05-31', text_position, '$L_4$\nC: 44608\nD: 610', color='black', size=10)
         ### Eid ul Adha
         ax2[0].vlines('2020-07-31', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
         ax2[0].text('2020-08-01', text_position, '$L_5$', color='black', size=10)
@@ -217,6 +217,19 @@ for i in range(len(files)):
         ### Winter
         ax2[0].vlines('2020-11-15', color='r', alpha=0.5, ymin=line_min, ymax=line_max)
         ax2[0].text('2020-11-16', text_position, 'Winter', color='r', size=10)
+        ### 21st February
+        ax2[0].vlines('2021-02-21', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2021-02-22', text_position, '$L_7$', color='k', size=10)
+        ### 26th march
+        ax2[0].vlines('2021-03-26', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2021-03-27', text_position, '$L_8$', color='k', size=10)
+        ### locked down
+        ax2[0].vlines('2021-04-05', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2021-04-06', text_position, '$L_9$', color='k', size=10)
+        ### complete locked down
+        ax2[0].vlines('2021-04-14', color='k', alpha=0.5, ymin=line_min, ymax=line_max)
+        ax2[0].text('2021-04-15', text_position, '$L_{10}$', color='k', size=10)
+
 
         ### Rt
         tag = [12, 'plot', 'r-', '$R_t$', None]

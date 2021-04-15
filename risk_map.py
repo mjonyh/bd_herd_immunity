@@ -68,6 +68,7 @@ for week in weeks:
     for district in districts:
         map_df.loc[map_df['DIST_NAME'] == district.upper(), 'risk'] = df_risk.loc[df_risk.district == district, week].values[0]
 
+    print(week, map_df[['DIST_NAME', 'risk']])
     if (i == len(weeks)-1):
         condition = True
     else:

@@ -238,7 +238,7 @@ for i in range(len(files)):
         # l2, = ax2.plot(df_rt_1['Date'], df_rt_1['ML'], color=color, marker='.', label='$R_t$')
         tag = [12, 'plot', 'r.', None, None]
         graph_plot(df_rt_1['Date'], df_rt_1['ML'], tag, ax2[0])       # active cases
-        annot_max(df_rt_1['Date'], df_rt_1['ML'], ax2[0], 'r')
+        # annot_max(df_rt_1['Date'], df_rt_1['ML'], ax2[0], 'r')
 
         test = ax2[0].fill_between(df_rt_1['Date'], df_rt_1['Low_90'], df_rt_1['High_90'], alpha=0.5, color='r')
 
